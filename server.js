@@ -7,6 +7,8 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
+const Game = require('./util/game.js');
+
 app.set('port', 3001);
 app.use('/static', express.static(__dirname + '/static'));
 
@@ -21,75 +23,80 @@ server.listen(3001, function() {
 });
 
 var players = {};
+var games = {};
+var nextId = 0;
 
-var game = {};
-
-// Add the WebSocket handlers
 io.on('connection', function(socket) {
+
+  var log = function(msg) {
+    console.log("[" + socket.id + "] - " + msg);
+  };
+
   socket.on('new player', function() {
+    log("new player");
     players[socket.id] = {
       id: socket.id
     };
   });
 
-  socket.on('clicked button', function() {
-    console.log(socket.id + " clicked the button");
-    io.emit('message', socket.id + " clicked the button");
+  socket.on('new game request', function(callback) {
+    log("new game request");
+    let g = new Game(nextId);
+    games[nextId] = g;
+    socket.join(nextId);
+    g.addPlayer(socket.id);
+    players[socket.id]["game"] = nextId;
+    callback({
+      success: true,
+      game: g.getJson()
+    });
+
+    nextId++;
   });
 
-  socket.on('game button clicked', function() {
-
-    // board = new Array(3);
-    // for (var i = 0; i < board.length; i++) {
-    //   [i] = new Array(3);
-    // }
-
-    game = {
-      next: 'X',
-      board: Array.from(Array(3), () => new Array(3))
-    };
-    console.log("emitting new game");
-    io.emit('new game');
+  socket.on('join game request', function(data, callback) {
+    log("join game request: " + data.id);
+    let id = data.id;
+    if (id in games) {
+      socket.join(id);
+      let g = games[id];
+      g.addPlayer(socket.id);
+      players[socket.id]["game"] = id;
+      callback({
+        success: true,
+        game: g.getJson(),
+      });
+      socket.to(id).emit('game update', { game: g.getJson() });
+    } else {
+      callback({
+        success: false,
+        error: "Game with id " + id + " does not exist"
+      });
+    }
   });
 
-  socket.on('clicked', function(data) {
-    console.log(data);
-    game['last'] = {x: data.x, y: data.y};
-    game['board'][data.x][data.y] = game.next;
-    game['next'] = game.next == 'X' ? 'O' : 'X';
-    console.log("new board:");
-    console.log(game);
-    // game = Object.assign(game, {
-    //   last: [data.x, data.y],
-    //   next: game.next == 'X' ? 'O' : 'X'
-    // });
-    io.emit('game state', game);
-  });
+  socket.on('leave game request', function(callback) {
+    log("leave game request");
+    let id = players[socket.id]["game"];
+    log("id: " + id);
+    if (id !== undefined) {
+      let g = games[id];
+      socket.leave(id);
+      g.removePlayer(socket.id);
+      delete players[socket.id]["game"];
+      callback({ success: true });
 
-  socket.on('disconnect', function() {
-    console.log(socket.id + ' disconnected');
+      if (g.isEmpty()) {
+        console.log("game " + id + " is empty, deleting");
+        delete games[id];
+      } else {
+        socket.to(id).emit('game update', { game: g.getJson() });
+      }
+    } else {
+      callback({
+        success: false,
+        error: "Not in a game"
+      });
+    }
   });
 });
-
-setInterval(function() {
-  io.sockets.emit('message', 'hi!');
-}, 3000);
-
-// io.on('connection', function(socket) {
-
-//   socket.on('movement', function(data) {
-//     var player = players[socket.id] || {};
-//     if (data.left) {
-//       player.x -= 5;
-//     }
-//     if (data.up) {
-//       player.y -= 5;
-//     }
-//     if (data.right) {
-//       player.x += 5;
-//     }
-//     if (data.down) {
-//       player.y += 5;
-//     }
-//   });
-// });

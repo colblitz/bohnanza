@@ -11,15 +11,16 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-    <link type="text/css" rel="stylesheet" href="/static/game.css" />
+    <link type="text/css" rel="stylesheet" href="/static/client.css" />
   </head>
   <body>
-    <canvas id="canvas"></canvas>
-    <button id="button">A Button</button>
-    <button id="game-button">New Game</button>
-    <div id="board"></div>
+    <div id="game"><pre id="game-state"></pre></div>
+    <button id="new-game-button">New Game</button>
+    <button id="join-game-button">Join Game</button>
+    <button id="leave-game-button" style="display:none;">Leave Game</button>
+    <input type="text" id="join-game-id">
   </body>
-  <script src="/static/game.js"></script>
+  <script src="/static/client.js"></script>
 </html>
 
 
