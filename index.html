@@ -14,10 +14,16 @@
     <link type="text/css" rel="stylesheet" href="/static/client.css" />
   </head>
   <body>
-    <div id="game"><pre id="game-state"></pre></div>
+    <div id="game" style="display:none;">
+      <pre id="game-state"></pre>
+      My points: <div id="my-points"></div>
+    </div>
     <button id="new-game-button">New Game</button>
     <button id="join-game-button">Join Game</button>
+    <button id="start-game-button" style="display:none;">Start Game</button>
     <button id="leave-game-button" style="display:none;">Leave Game</button>
+    <button id="draw1-game-button" style="display:none;">Draw 1</button>
+    <button id="draw2-game-button" style="display:none;">Draw 2</button>
     <input type="text" id="join-game-id">
   </body>
   <script src="/static/client.js"></script>

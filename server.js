@@ -8,6 +8,7 @@ var server = http.Server(app);
 var io = socketIO(server);
 
 const Game = require('./util/game.js');
+const Deck = require('./util/deck.js');
 
 app.set('port', 3001);
 app.use('/static', express.static(__dirname + '/static'));
@@ -32,71 +33,121 @@ io.on('connection', function(socket) {
     console.log("[" + socket.id + "] - " + msg);
   };
 
-  socket.on('new player', function() {
+  var errorResponse = function(callback, msg) {
+    callback({
+      success: false,
+      error: msg
+    });
+  }
+
+  socket.on('new player', function(callback) {
     log("new player");
     players[socket.id] = {
       id: socket.id
     };
+
+    callback({ success: true, id: socket.id });
   });
 
   socket.on('new game request', function(callback) {
     log("new game request");
-    let g = new Game(nextId);
-    games[nextId] = g;
-    socket.join(nextId);
-    g.addPlayer(socket.id);
-    players[socket.id]["game"] = nextId;
-    callback({
-      success: true,
-      game: g.getJson()
-    });
 
+    var gid = nextId;
     nextId++;
+
+    let g = new Game(gid);
+    games[gid] = g;
+    socket.join(gid);
+    g.addPlayer(socket.id);
+    players[socket.id]["game"] = gid;
+
+    callback({ success: true });
+    io.in(gid).emit('game update', { game: g.getJson() });
   });
 
   socket.on('join game request', function(data, callback) {
     log("join game request: " + data.id);
-    let id = data.id;
-    if (id in games) {
-      socket.join(id);
-      let g = games[id];
-      g.addPlayer(socket.id);
-      players[socket.id]["game"] = id;
-      callback({
-        success: true,
-        game: g.getJson(),
-      });
-      socket.to(id).emit('game update', { game: g.getJson() });
-    } else {
-      callback({
-        success: false,
-        error: "Game with id " + id + " does not exist"
-      });
+    let gid = data.id;
+
+    if (!(gid in games)) {
+      errorResponse(callback, "Game with id " + gid + " does not exist");
+      return;
     }
+
+    socket.join(gid);
+    let g = games[gid];
+
+    if (g.isStarted) {
+      errorResponse(callback, "Game with id " + gid + " has already started");
+      return;
+    }
+
+    g.addPlayer(socket.id);
+    players[socket.id]["game"] = gid;
+    callback({ success: true });
+
+    io.in(gid).emit('game update', { game: g.getJson() });
   });
 
   socket.on('leave game request', function(callback) {
-    log("leave game request");
-    let id = players[socket.id]["game"];
-    log("id: " + id);
-    if (id !== undefined) {
-      let g = games[id];
-      socket.leave(id);
-      g.removePlayer(socket.id);
-      delete players[socket.id]["game"];
-      callback({ success: true });
+    let gid = players[socket.id]["game"];
+    log("leave game request: " + gid);
 
-      if (g.isEmpty()) {
-        console.log("game " + id + " is empty, deleting");
-        delete games[id];
-      } else {
-        socket.to(id).emit('game update', { game: g.getJson() });
-      }
-    } else {
-      callback({
-        success: false,
-        error: "Not in a game"
-      });
+    if (typeof gid == 'undefined') {
+      errorResponse(callback, "Not in a game");
+      return;
     }
+
+    let g = games[gid];
+    socket.leave(gid);
+    g.removePlayer(socket.id);
+    delete players[socket.id]["game"];
+    callback({ success: true });
+
+    if (g.players.length == 0) {
+      console.log("game " + gid + " is empty, deleting");
+      delete games[gid];
+    } else {
+      io.in(gid).emit('game update', { game: g.getJson() });
+    }
+  });
+
+  socket.on('start game request', function(callback) {
+    let gid = players[socket.id]["game"];
+    log("start game request: " + gid);
+
+    if (typeof gid == 'undefined') {
+      errorResponse(callback, "Not in a game");
+      return;
+    }
+
+    let g = games[gid];
+
+    if (!g.canStart()) {
+      errorResponse(callback, "Game not ready to start");
+      return;
+    }
+
+    g.startGame();
+
+    callback({ success: true });
+    io.in(gid).emit('game update', { game: g.getJson() });
+  });
+
+  socket.on('game move', function(data, callback) {
+    let gid = players[socket.id]["game"];
+    log("game move: " + JSON.stringify(data));
+
+    if (typeof gid == 'undefined') {
+      errorResponse(callback, "Not in a game");
+      return;
+    }
+
+    let g = games[gid];
+
+    let result = g.makeMove(Object.assign({player: socket.id}, data));
+
+    callback(result);
+    io.in(gid).emit('game update', { game: g.getJson() });
   });
 });
