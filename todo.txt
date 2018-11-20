@@ -1,4 +1,7 @@
- - make the game have a win condition
+ - myPoints doesn't work
+ - have server send different views of game state according to player (get once, transform based on id)
+ - change ui once ended - leave game after ending
+ - calculate winner in game
  - list of games?
  - have an actual front end framework or something
  - separate out socket io files
