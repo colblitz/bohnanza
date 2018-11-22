@@ -18,6 +18,15 @@ app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/whee', function(request, response) {
+  response.json({
+    test: 'hello world!',
+    players: players,
+    games: games,
+    nextId: nextId
+  });
+});
+
 // Starts the server.
 server.listen(3001, function() {
   console.log('Starting server on port 3001');
