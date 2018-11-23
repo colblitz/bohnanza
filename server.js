@@ -10,7 +10,8 @@ var io = socketIO(server);
 const Game = require('./util/game.js');
 const Deck = require('./util/deck.js');
 
-app.set('port', 3001);
+// app.set('port', 3001);
+http.listen(3001, "127.0.0.1");
 app.use('/static', express.static(__dirname + '/static'));
 
 // Routing
@@ -18,14 +19,14 @@ app.get('/', function(request, response) {
   response.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/whee', function(request, response) {
-  response.json({
-    test: 'hello world!',
-    players: players,
-    games: games,
-    nextId: nextId
-  });
-});
+// app.get('/whee', function(request, response) {
+//   response.json({
+//     test: 'hello world!',
+//     players: players,
+//     games: games,
+//     nextId: nextId
+//   });
+// });
 
 // Starts the server.
 server.listen(3001, function() {

@@ -1,5 +1,21 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import io from 'socket.io-client';
+
+const App = () => (
+  <div>
+     <h1>Hello world!!</h1>
+  </div>
+)
+ReactDOM.render(<App/>, document.getElementById('root'));
+
+const socket = io('http://localhost:3001');
+
+// console.log('socket: ');
+console.log(socket);
 // var socket = io();
-// var myId;
+// console.log(socket);
+// // var myId;
 // socket.emit('new player', function(response) {
 //   if (response.success) {
 //     console.log("Got my client id: " + response.id);
