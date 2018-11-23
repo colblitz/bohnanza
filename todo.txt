@@ -1,8 +1,7 @@
- - myPoints doesn't work
+ - fix nodemon/webpack - https://itnext.io/auto-reload-a-full-stack-javascript-project-using-nodemon-and-webpack-dev-server-together-a636b271c4e
  - have server send different views of game state according to player (get once, transform based on id)
- - change ui once ended - leave game after ending
+ - make a hand
+ - make a board
  - calculate winner in game
- - list of games?
- - have an actual front end framework or something
- - separate out socket io files
-    - https://techxmag.com/questions/how-to-organize-socket-handling-in-node-js-and-socket-io-app/
+ - list of games
+- separate out socket.io files - https://techxmag.com/questions/how-to-organize-socket-handling-in-node-js-and-socket-io-app/
