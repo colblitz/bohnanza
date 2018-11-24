@@ -1,4 +1,4 @@
-export default class Card {
+class Card {
   constructor(number) {
     if (typeof number !== 'undefined') {
       this.number = number;
@@ -13,3 +13,5 @@ export default class Card {
     }
   }
 };
+
+module.exports = Card;

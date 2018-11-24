@@ -13,7 +13,7 @@ socket.emit('new player', function(response) {
 });
 
 const App = () => {
-  return <div>Hello World</div>
+  return <div>Hesllo  asefasefasef sWorld</div>
 }
 ReactDOM.render(
   <App />,

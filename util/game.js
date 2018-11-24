@@ -1,6 +1,6 @@
-import Deck from './deck';
+const Deck = require('./deck.js');
 
-export default class Game {
+class Game {
   constructor(id) {
     this.id = id;
     this.players = [];
@@ -70,3 +70,4 @@ export default class Game {
     };
   }
 };
+module.exports = Game;

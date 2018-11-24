@@ -1,26 +1,33 @@
-import express from 'express'; 
-import webpackMiddleware from 'webpack-dev-middleware';
-import webpack from 'webpack';
-import webpackConfig from './webpack.config.js';
-import http from 'http';
-import SocketIO from 'socket.io';
+// Dependencies
+var express = require('express');
+var http = require('http');
+var path = require('path');
+var socketIO = require('socket.io');
+var app = express();
+var server = http.Server(app);
+var io = socketIO(server);
 
-import Game from './util/deck';
+const Game = require('./util/game.js');
+const Deck = require('./util/deck.js');
 
-const app = express();
+app.set('port', 3001);
+// app.use('/static', express.static(__dirname + '/static'));
+app.use('/', express.static('dist', { index: false }));
 
-let server = http.Server(app);
-let io = new SocketIO(server);
+// Routing
+app.get('/', function(request, response) {
+  response.sendFile(path.join(__dirname + '/dist', 'index.html'));
+});
 
-app.use(webpackMiddleware(webpack(webpackConfig)));
-
-server.listen(3001, () => {
+// Starts the server.
+server.listen(3001, function() {
   console.log('Starting server on port 3001');
 });
 
 var players = {};
 var games = {};
 var nextId = 0;
+
 io.on('connection', function(socket) {
 
   var log = function(msg) {
@@ -32,7 +39,7 @@ io.on('connection', function(socket) {
       success: false,
       error: msg
     });
-  };
+  }
 
   socket.on('new player', function(callback) {
     log("new player");
