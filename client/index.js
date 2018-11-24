@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './style/style.scss';
+import './style/global.scss';
 import io from 'socket.io-client';
+import Homepage from './components/homepage.jsx';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './redux/store.js';
 
 let socket = io();
 let myId;
@@ -13,10 +17,18 @@ socket.emit('new player', function(response) {
 });
 
 const App = () => {
-  return <div>Hesllo  asefasefasef sWorld</div>
+  return (
+  	<Switch>
+  		<Route exact path='/' component={Homepage}/>
+  	</Switch>
+  );
 }
 ReactDOM.render(
-  <App />,
+  <Provider store={store}>
+  	<BrowserRouter>
+    	<App />
+    </BrowserRouter>
+  </Provider>,
   document.querySelector('#root')
 );
 
