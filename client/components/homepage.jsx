@@ -6,10 +6,8 @@ import { connect } from 'react-redux';
 
 // import PropTypes from 'prop-types';
 
-// const propTypes = {
-
-// }
-
+const propTypes = {
+}
 class Homepage extends React.Component {
   // onClick = () => {
   //   console.log('on click handler');
@@ -18,6 +16,7 @@ class Homepage extends React.Component {
 
 
 	render() {
+    const test = 'yay';
 		return (
       <div>Homepage </div>
 		);
