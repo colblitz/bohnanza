@@ -1,5 +1,5 @@
-export const EXAMPLE = 'EXAMPLE_ACTION';
+export const EXAMPLE = "EXAMPLE_ACTION";
 
 export const exampleAction = () => ({
-  type: EXAMPLE,
+  type: EXAMPLE
 });

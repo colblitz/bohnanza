@@ -1,18 +1,17 @@
-import * as Action from './actions';
+import * as Action from "./actions";
 
-const defaultState = {
-
-};
+const defaultState = {};
 
 const reducers = (state = defaultState, action) => {
   switch (Action.type) {
     case action.EXAMPLE: {
       return {
         ...state,
-        test: 'hi',
+        test: "hi"
       };
     }
-    default: return state;
+    default:
+      return state;
   }
 };
 

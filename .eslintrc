@@ -3,6 +3,7 @@
   "plugins": [
     "react"
   ],
+  "extends": "airbnb",
   "rules": {
     "space-in-parens": [ 0, "always" ],
     "template-curly-spacing": [ 2, "always" ],
@@ -28,5 +29,5 @@
     "no-shadow": [ 1 ],
     "camelcase": [ 1 ],
     "no-underscore-dangle" : [0, "always"],
-  }
+  },
 }
