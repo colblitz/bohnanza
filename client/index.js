@@ -16,6 +16,8 @@ socket.emit('new player', function(response) {
   }
 });
 
+socket.emit('asdf');
+
 const App = () => {
   return (
   	<Switch>
