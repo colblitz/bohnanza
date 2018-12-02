@@ -36,9 +36,36 @@ exports = module.exports = function(io, state) {
 
       var r = state.joinGame(data.id, socket.id);
       if (r.success) {
-        callback({ success: true });  
+        callback({ success: true });
         socket.join(data.id);
         io.in(gid).emit('game update', { game: g.getJson() });
+      } else {
+        errorResponse(callback, r.error);
+      }
+    });
+
+    socket.on('leave game request', function(callback) {
+      log("leave game request from: " + socket.id);
+
+      var r = state.leaveGame(socket.id);
+      if (r.success) {
+        socket.leave(r.gid);
+        callback({ success: true });
+        if (!r.deleted) {
+          io.in(gid).emit('game update', { game: r.json });
+        }
+      } else {
+        errorResponse(callback, r.error);
+      }
+    });
+
+    socket.on('start game request', function(callback) {
+      log("start game request from: " + socket.id);
+
+      var r = state.startGame(socket.id);
+      if (r.success) {
+        callback({ success: true });
+        io.in(gid).emit('game update', { game: r.json });
       } else {
         errorResponse(callback, r.error);
       }

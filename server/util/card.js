@@ -12,6 +12,11 @@ class Card {
       number: this.number,
     }
   }
+
+  static calculateValue(cards) {
+    // TODO: get values
+    return cards.length;
+  }
 };
 
 module.exports = Card;

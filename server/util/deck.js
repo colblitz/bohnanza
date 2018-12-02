@@ -57,8 +57,21 @@ class Deck {
     return card;
   }
 
-  discard(card) {
-    this.discardPile.push(card);
+  drawCards(n) {
+    var cards = [];
+    for (var i = 0; i < n; i++) {
+      cards.push(this.cards.shift())
+      if (this.cards.length == 0) {
+        this.shuffleDiscardIntoDeck();
+      }
+    }
+    return cards;
+  }
+
+  discard(cards) {
+    for (var i = 0; i < cards.length; i++) {
+      this.discardPile.push(cards[i]);
+    }
   }
 
   getJson() {

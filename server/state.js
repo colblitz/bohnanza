@@ -41,6 +41,7 @@ class State {
   }
 
   leaveGame(pid) {
+    // game already started
     if (!(pid in this.players)) {
       return { success: false, error: "Player " + pid + " does not exist" };
     }
@@ -59,8 +60,8 @@ class State {
       delete this.games[gid];
       deleted = true;
     }
-    return { 
-      success: true, 
+    return {
+      success: true,
       gid: gid,
       json: g.getJson(),
       deleted: deleted };
