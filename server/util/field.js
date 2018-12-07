@@ -12,7 +12,7 @@ class Field {
     return this.slots.length;
   }
 
-  addToSlot(i, c) {
+  plant(i, c) {
     // if plot is empty or same type
     if (this.slots[i].length == 0 || this.slots[i][0].number == c.number) {
       this.slots[i].push(c);
@@ -45,6 +45,18 @@ class Field {
       }
     }
     return false;
+  }
+
+  getJson() {
+    return {
+      slots: this.slots.map(x => x.length == 0 ? {
+        length: 0,
+        card: null
+      } : {
+        length: x.length,
+        card: x[0].getJson()
+      }),
+    };
   }
 };
 

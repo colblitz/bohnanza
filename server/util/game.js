@@ -10,8 +10,9 @@ class Game {
     this.isEnded = false;
     this.currentTurn = null;
     this.currentPhaseInTurn = 0;
-    this.deck = new Deck(10);
+    this.plantedFromHand = 0;
     this.playerIds = [];
+    this.deck = new Deck(10);
     this.players = {};
     this.fields = {};
     this.turnedOver = [];
@@ -36,6 +37,14 @@ class Game {
     }, this);
   }
 
+  nextTurn() {
+    this.currentTurn = (this.currentTurn + 1) % (this.playerIds.length);
+    this.currentPhaseInTurn = 0;
+    this.plantedFromHand = 0;
+    this.turnedOver = [];
+    this.trades = [];
+  }
+
   // actions
   // anytime:
   // - harvest a plot
@@ -53,13 +62,17 @@ class Game {
 
   // TODO: plant cards from middle
   // HARVEST {
-  //   plot: int
+  //   index: int
   // }
   // UPGRADE
   // START_PHASE {
   //   phase: int
   // }
-  // PLANT - optional second card
+  // PLANT - optional second card {
+  //   type: HAND or MID or TRADE
+  //   index: int
+  //   slot: id
+  // }
   // PROPOSE_TRADE (modifies existing) {
   //   offer:
   //   person: empty
@@ -89,7 +102,7 @@ class Game {
     var field = this.fields[request.player];
 
     if (request.action == "HARVEST") {
-      var harvested = field.harvest(request.plot);
+      var harvested = field.harvest(request.index);
       if (harvested.length > 0) {
         // calculate amount for harvested, add gold
         var gold = Card.calculateValue(harvested);
@@ -118,8 +131,7 @@ class Game {
         var cards = this.deck.drawCards(Constants.NUM_TO_DRAW);
         player.drewCards(cards);
 
-        this.currentTurn = (this.currentTurn + 1) % (this.playerIds.length);
-        this.turnedOver = [];
+        this.nextTurn();
         // TODO: check game over
       } else {
         return { success: false, error: "Invalid phase" };
@@ -127,35 +139,27 @@ class Game {
 
     } else if (request.action == "PLANT") {
       checkPlayer();
-      // card gets planted
+      if (request.type == "HAND" && this.plantedFromHand < 2) {
+        var card = player.removeCard(0);
+        field.plant(request.slot, card);
+        this.plantedFromHand += 1;
+      } else if (request.type == "MID") {
+        var card = this.turnedOver[request.index];
+        this.turnedOver[request.index] = null; // TODO: splice instead?
+        field.plant(request.slot, card);
+      } else if (request.type == "TRADE") {
+        var card = this.trades[request.index];
+        this.trades[request.index] = null; // TODO: splice instead?
+        field.plant(request.slot, card);
+      }
     } else if (request.action == "PROPOSE_TRADE") {
       checkPlayer();
+
     } else if (request.action == "CONFIRM_TRADE") {
 
     } else {
       return { success: false, error: "Unknown action" };
     }
-
-    // if (request.player == this.playerIds[this.currentTurn]) {
-    //   var drawn = [];
-    //   for (var i = 0; i < request.draw; i++) {
-    //     var c = this.deck.drawCard();
-    //     console.log(request.player + " drew " + c.number);
-    //     this.points[request.player] += c.number;
-    //     drawn.push(c);
-    //     this.deck.discard(c);
-    //   }
-
-    //   if (this.deck.getTimesShuffled() >= 3) {
-    //     this.isEnded = true;
-    //   }
-
-    //   this.currentTurn = (this.currentTurn + 1) % (this.playerIds.length);
-
-    //   return { success: true, drawn: drawn };
-    // } else {
-    //   return { success: false, error: "Not your turn" };
-    // }
   }
 
   canStart() {
@@ -165,22 +169,34 @@ class Game {
   getJson() {
     return {
       id: this.id,
-      playerIds: this.playerIds,
       isStarted: this.isStarted,
       isEnded: this.isEnded,
       currentTurn: this.currentTurn,
+      currentPhaseInTurn: this.currentPhaseInTurn,
+      plantedFromHand: this.plantedFromHand,
+      playerIds: this.playerIds,
       deck: this.deck.getJson(),
+      players: this.players.map(x => x.getJson()),
+      fields: this.fields.map(x => x.getJson()),
+      turnedOver: this.turnedOver.map(x => x.getJson()),
+      trades: this.trades.map(x => x.getJson())
     };
   }
 
   getJsonForPlayer(pid) {
     return {
       id: this.id,
-      playerIds: this.playerIds,
       isStarted: this.isStarted,
       isEnded: this.isEnded,
       currentTurn: this.currentTurn,
+      currentPhaseInTurn: this.currentPhaseInTurn,
+      plantedFromHand: this.plantedFromHand,
+      playerIds: this.playerIds,
       deck: this.deck.getJson(),
+      players: this.players.map(x => x.getJsonForPlayer(pid)),
+      fields: this.fields.map(x => x.getJson()),
+      turnedOver: this.turnedOver.map(x => x.getJson()),
+      trades: this.trades.map(x => x.getJson())
     };
   }
 };

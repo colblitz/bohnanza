@@ -18,6 +18,22 @@ class Player {
   incrGold(n) {
     this.gold += n;
   }
+
+  getJson() {
+    return {
+      id: this.id,
+      gold: this.gold,
+      hand: this.hand.map(x => x.getJson()),
+    };
+  }
+
+  getJsonForPlayer(pid) {
+    return {
+      id: this.id,
+      gold: this.gold,
+      hand: this.hand.map(x => x.getJson()),
+    };
+  }
 };
 
 module.exports = Player;
