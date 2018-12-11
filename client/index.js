@@ -5,18 +5,18 @@ import io from 'socket.io-client';
 import Homepage from './components/homepage.jsx';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './redux/store.js';
+import store from './redux/store.js';
 
-let socket = io();
-let myId;
-socket.emit('new player', function(response) {
-  if (response.success) {
-    console.log("Got my client id: " + response.id);
-    myId = response.id;
-  }
-});
+// let socket = io();
+// let myId;
+// socket.emit('new player', function(response) {
+//   if (response.success) {
+//     console.log("Got my client id: " + response.id);
+//     myId = response.id;
+//   }
+// });
 
-socket.emit('asdf');
+// socket.emit('asdf');
 
 const App = () => {
   return (

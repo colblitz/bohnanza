@@ -3,8 +3,11 @@ import * as Action from "./actions";
 const defaultState = {};
 
 const reducers = (state = defaultState, action) => {
-  switch (Action.type) {
-    case action.EXAMPLE: {
+  console.log("in reducer");
+  console.log(state);
+  console.log(action);
+  switch (action.type) {
+    case Action.EXAMPLE: {
       return {
         ...state,
         test: "hi"
