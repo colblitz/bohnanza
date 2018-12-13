@@ -71,7 +71,7 @@ class State {
     if (!(pid in this.players)) {
       return { success: false, error: "Player " + pid + " does not exist" };
     }
-    var gid = players[pid]["game"];
+    var gid = this.players[pid]["game"];
     if (typeof gid == 'undefined') {
       return { success: false, error: "Player " + pid + " not in a game" };
     }
@@ -86,7 +86,7 @@ class State {
     if (!(pid in this.players)) {
       return { success: false, error: "Player " + pid + " does not exist" };
     }
-    var gid = players[pid]["game"];
+    var gid = this.players[pid]["game"];
     if (typeof gid == 'undefined') {
       return { success: false, error: "Player " + pid + " not in a game" };
     }

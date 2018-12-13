@@ -1,3 +1,5 @@
+const Types = require('./types.js');
+
 exports = module.exports = function(io, state) {
   io.on('connection', function (socket) {
     // util methods - TODO: find way to not have to duplicate
@@ -13,10 +15,11 @@ exports = module.exports = function(io, state) {
     }
 
     // message methods
-    socket.on('game move', function(data, callback) {
+    socket.on(Types.API_GAME_SEND_MOVE, function(data, callback) {
       log("game move from player " + socket.id + ": " + JSON.stringify(data));
 
       var r = state.gameMove(socket.id, data);
+      console.log(r);
       if (r.success) {
         callback({ success: true, result: r.results });
         io.in(gid).emit('game update', { game: r.json });

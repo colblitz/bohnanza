@@ -1,3 +1,5 @@
+const Types = require('./types.js');
+
 exports = module.exports = function(io, state) {
   var nextId = 0;
   io.on('connection', function (socket) {
@@ -14,14 +16,14 @@ exports = module.exports = function(io, state) {
     };
 
     // message methods
-    socket.on('new player', function(callback) {
+    socket.on(Types.API_ON_CONNECT, function(callback) {
       log("new player");
       state.newPlayer(socket.id);
 
       callback({ success: true, id: socket.id });
     });
 
-    socket.on('new game request', function(callback) {
+    socket.on(Types.API_GAME_CREATE, function(callback) {
       log("new game request");
 
       var gid = state.createGame(socket.id);
@@ -31,7 +33,7 @@ exports = module.exports = function(io, state) {
       io.in(gid).emit('game update', { game: g.getJson() });
     });
 
-    socket.on('join game request', function(data, callback) {
+    socket.on(Types.API_GAME_JOIN, function(data, callback) {
       log("join game request: " + data.id);
 
       var r = state.joinGame(data.id, socket.id);
@@ -44,7 +46,7 @@ exports = module.exports = function(io, state) {
       }
     });
 
-    socket.on('leave game request', function(callback) {
+    socket.on(Types.API_GAME_LEAVE, function(callback) {
       log("leave game request from: " + socket.id);
 
       var r = state.leaveGame(socket.id);
@@ -59,7 +61,7 @@ exports = module.exports = function(io, state) {
       }
     });
 
-    socket.on('start game request', function(callback) {
+    socket.on(Types.API_GAME_START, function(callback) {
       log("start game request from: " + socket.id);
 
       var r = state.startGame(socket.id);

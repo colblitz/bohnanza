@@ -1,5 +1,5 @@
 import React from 'react';
-import { exampleAction, sendMove } from '../redux/actions';
+import { exampleAction, gameSendMove, actionChanged } from '../redux/actions';
 import { connect } from 'react-redux';
 
 // import PropTypes from 'prop-types';
@@ -8,12 +8,6 @@ const propTypes = {
 };
 
 class Homepage extends React.Component {
-  // onClick = () => {
-  //   console.log('on click handler');
-  //   this.props.sendAction();
-  // }
-
-
 	render() {
     const test = 'yay';
 		return (
@@ -21,9 +15,9 @@ class Homepage extends React.Component {
         Homepage
         <button id="game-button">New/Join Game</button>
         <div id="game">
-          <pre id="game-state"></pre>
-          <textarea id="input"></textarea>
-          <button id="submit-button" onClick={(e) => this.props.send()}>Send</button>
+          <pre id="game-state" value={this.props.gameState}></pre>
+          <textarea id="input" value={this.props.action} onChange={(e) => this.props.actionChanged(e)}></textarea>
+          <button id="submit-button" onClick={(e) => this.props.sendMove(this.props.action)}>Send</button>
         </div>
       </div>
 
@@ -33,16 +27,22 @@ class Homepage extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-
+    gameState: state["gameState"],
+    action: state["action"]
   };
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     sendAction: () => {dispatch(exampleAction())},
-    send: () => {
-      console.log("lkjalskjf lkajs el fkj ");
-      dispatch(sendMove())
+
+    actionChanged: (e) => {
+      var value = e.target.value;
+      dispatch(actionChanged(value));
+    },
+    sendMove: (data) => {
+      console.log("sending game move");
+      dispatch(gameSendMove(data));
     }
   }
 }

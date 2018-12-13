@@ -2,20 +2,25 @@ import React from "react";
 import { createStore, applyMiddleware, compose } from 'redux';
 import reducers from "./reducers.js";
 import startApi, {socketMiddleware} from './socketapi';
+import { createLogger } from 'redux-logger';
 
-// const store = createStore(
-//   combineReducers({
-//     state: reducers
-//   }),
-//   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-// );
+const initialState = {
+  gameState: {},
+  action: "{}",
+}
 
-// const middleware = [ReduxThunk, logger]
-const middleware = [socketMiddleware];
+// const stateTransformer = (state) => { return state.toJS(); };
+const stateTransformer = (state) => { return state; };
+const loggerMiddleware = createLogger({
+  stateTransformer,
+  diff: true
+});
+
+const middleware = [socketMiddleware, loggerMiddleware];
 
 // from https://github.com/zalmoxisus/redux-devtools-extension#12-advanced-store-setup
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducers, /* preloadedState, */ composeEnhancers(
+const store = createStore(reducers, initialState, composeEnhancers(
   applyMiddleware(...middleware)
 ));
 
