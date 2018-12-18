@@ -22,7 +22,7 @@ exports = module.exports = function(io, state) {
       console.log(r);
       if (r.success) {
         callback({ success: true, result: r.results });
-        io.in(gid).emit('game update', { game: r.json });
+        io.in(gid).emit(Types.API_GAME_UPDATE, { game: r.json });
       } else {
         errorResponse(callback, r.error);
       }

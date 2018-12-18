@@ -167,6 +167,15 @@ class Game {
   }
 
   getJson() {
+    var playerJson = {};
+    Object.keys(this.players).forEach(function(key) {
+      playerJson[key] = this.players[key].getJson();
+    });
+    var fieldJson = {};
+    Object.keys(this.fields).forEach(function(key) {
+      fieldJson[key] = this.fields[key].getJson();
+    });
+
     return {
       id: this.id,
       isStarted: this.isStarted,
@@ -176,14 +185,23 @@ class Game {
       plantedFromHand: this.plantedFromHand,
       playerIds: this.playerIds,
       deck: this.deck.getJson(),
-      players: this.players.map(x => x.getJson()),
-      fields: this.fields.map(x => x.getJson()),
+      players: playerJson,
+      fields: fieldJson,
       turnedOver: this.turnedOver.map(x => x.getJson()),
       trades: this.trades.map(x => x.getJson())
     };
   }
 
   getJsonForPlayer(pid) {
+    var playerJson = {};
+    Object.keys(this.players).forEach(function(key) {
+      playerJson[key] = this.players[key].getJsonForPlayer(key);
+    });
+    var fieldJson = {};
+    Object.keys(this.fields).forEach(function(key) {
+      fieldJson[key] = this.fields[key].getJson();
+    });
+
     return {
       id: this.id,
       isStarted: this.isStarted,
@@ -193,8 +211,8 @@ class Game {
       plantedFromHand: this.plantedFromHand,
       playerIds: this.playerIds,
       deck: this.deck.getJson(),
-      players: this.players.map(x => x.getJsonForPlayer(pid)),
-      fields: this.fields.map(x => x.getJson()),
+      players: playerJson,
+      fields: fieldJson,
       turnedOver: this.turnedOver.map(x => x.getJson()),
       trades: this.trades.map(x => x.getJson())
     };

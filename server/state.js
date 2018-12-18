@@ -13,6 +13,15 @@ class State {
     };
   }
 
+  getGameJson(gid) {
+    console.log("getting json for game ", gid);
+    if (!(gid in this.games)) {
+      console.log("game doesn't exist");
+      return {};
+    }
+    return this.games[gid].getJson();
+  }
+
   createGame(pid) {
     var gid = this.nextId;
     this.nextId++;
@@ -21,8 +30,8 @@ class State {
     this.games[gid] = g;
     g.addPlayer(pid);
     this.players[pid]["game"] = gid;
-
-    return { gid: gid };
+    console.log("created game with id ", gid);
+    return { success: true, gid: gid };
   }
 
   joinGame(gid, pid) {
@@ -30,7 +39,7 @@ class State {
       return { success: false, error: "Game " + gid + " does not exist" };
     }
 
-    let g = games[gid];
+    let g = this.games[gid];
     if (g.isStarted) {
       return { success: false, error: "Game " + gid + " has already started" };
     }

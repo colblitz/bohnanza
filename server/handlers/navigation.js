@@ -23,30 +23,37 @@ exports = module.exports = function(io, state) {
       callback({ success: true, id: socket.id });
     });
 
-    socket.on(Types.API_GAME_CREATE, function(callback) {
-      log("new game request");
+    socket.on(Types.API_GAME_CREATE, function(data, callback) {
+      log("new game request with data, ", data);
 
-      var gid = state.createGame(socket.id);
-      socket.join(gid);
-
-      callback({ success: true });
-      io.in(gid).emit('game update', { game: g.getJson() });
-    });
-
-    socket.on(Types.API_GAME_JOIN, function(data, callback) {
-      log("join game request: " + data.id);
-
-      var r = state.joinGame(data.id, socket.id);
+      var r = state.createGame(socket.id);
       if (r.success) {
+        var gid = r.gid;
+        console.log("gid: ", gid);
+        socket.join(gid);
+
         callback({ success: true });
-        socket.join(data.id);
-        io.in(gid).emit('game update', { game: g.getJson() });
+        io.in(gid).emit(Types.API_GAME_UPDATE, { game: state.getGameJson(gid) });
       } else {
         errorResponse(callback, r.error);
       }
     });
 
-    socket.on(Types.API_GAME_LEAVE, function(callback) {
+    socket.on(Types.API_GAME_JOIN, function(data, callback) {
+      log("join game request: " + data.id);
+      var gid = data.id;
+
+      var r = state.joinGame(gid, socket.id);
+      if (r.success) {
+        callback({ success: true });
+        socket.join(gid);
+        io.in(gid).emit(Types.API_GAME_UPDATE, { game: state.getGameJson(gid) });
+      } else {
+        errorResponse(callback, r.error);
+      }
+    });
+
+    socket.on(Types.API_GAME_LEAVE, function(data, callback) {
       log("leave game request from: " + socket.id);
 
       var r = state.leaveGame(socket.id);
@@ -54,20 +61,20 @@ exports = module.exports = function(io, state) {
         socket.leave(r.gid);
         callback({ success: true });
         if (!r.deleted) {
-          io.in(gid).emit('game update', { game: r.json });
+          io.in(gid).emit(Types.API_GAME_UPDATE, { game: r.json });
         }
       } else {
         errorResponse(callback, r.error);
       }
     });
 
-    socket.on(Types.API_GAME_START, function(callback) {
+    socket.on(Types.API_GAME_START, function(data, callback) {
       log("start game request from: " + socket.id);
 
       var r = state.startGame(socket.id);
       if (r.success) {
         callback({ success: true });
-        io.in(gid).emit('game update', { game: r.json });
+        io.in(gid).emit(Types.API_GAME_UPDATE, { game: r.json });
       } else {
         errorResponse(callback, r.error);
       }
