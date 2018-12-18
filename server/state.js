@@ -87,7 +87,7 @@ class State {
 
     var g = this.games[gid];
     g.startGame();
-    return { success: true, json: g.getJson() };
+    return { success: true, gid: gid, json: g.getJson() };
   }
 
   gameMove(pid, data) {
@@ -103,7 +103,7 @@ class State {
     var g = this.games[gid];
 
     var result = g.makeMove(Object.assign({player: pid}, data));
-    return { success: true, result: result, json: g.getJson() };
+    return { success: true, gid: gid, result: result, json: g.getJson() };
   }
 };
 

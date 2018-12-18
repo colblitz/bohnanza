@@ -1,5 +1,5 @@
 import React from 'react';
-import { exampleAction, gameSendMove, actionChanged, gameJoin, gameCreate } from '../redux/actions';
+import { exampleAction, gameSendMove, actionChanged, gameJoin, gameCreate, gameStart } from '../redux/actions';
 import { connect } from 'react-redux';
 
 // import PropTypes from 'prop-types';
@@ -16,10 +16,11 @@ class Homepage extends React.Component {
         <button id="game-button" onClick={(e) => this.props.newGame()}>New Game</button>
         <input type="text" id="join-game-id"></input>
         <button id="game-button2" onClick={(e) => this.props.joinGame()}>Join Game</button>
+        <button id="game-button3" onClick={(e) => this.props.startGame()}>Start Game</button>
         <div id="game">
           <pre id="game-state">{this.props.gameState}</pre>
           <textarea id="input" value={this.props.action} onChange={(e) => this.props.actionChanged(e)}></textarea>
-          <button id="submit-button" onClick={(e) => this.props.sendMove(this.props.action)}>Send</button>
+          <button id="submit-button" onClick={(e) => this.props.sendMove()}>Send</button>
         </div>
       </div>
 
@@ -48,13 +49,18 @@ const mapDispatchToProps = (dispatch) => {
       console.log("tryingn to join game ", id);
       dispatch(gameJoin({id: id}));
     },
+    startGame: () => {
+      dispatch(gameStart({}));
+    },
     actionChanged: (e) => {
       var value = e.target.value;
       dispatch(actionChanged(value));
     },
-    sendMove: (data) => {
-      console.log("sending game move");
-      dispatch(gameSendMove(data));
+    sendMove: () => {
+      var action = $('#input').val();
+      console.log(typeof action);
+      console.log("sending game move with action: ", JSON.parse(action));
+      dispatch(gameSendMove(JSON.parse(action)));
     }
   }
 }

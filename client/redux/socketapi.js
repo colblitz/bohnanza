@@ -10,6 +10,7 @@ export function socketMiddleware() {
     if (socket && action.type.startsWith("API_")) {
       console.log("Is an API action: ", action);
       socket.emit(action.type, action.data, function(response) {
+        console.log("response");
         console.log(response);
       });
     }

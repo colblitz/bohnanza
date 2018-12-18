@@ -74,7 +74,7 @@ exports = module.exports = function(io, state) {
       var r = state.startGame(socket.id);
       if (r.success) {
         callback({ success: true });
-        io.in(gid).emit(Types.API_GAME_UPDATE, { game: r.json });
+        io.in(r.gid).emit(Types.API_GAME_UPDATE, { game: r.json });
       } else {
         errorResponse(callback, r.error);
       }

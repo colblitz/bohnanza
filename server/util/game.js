@@ -87,16 +87,11 @@ class Game {
   //   other keys
   // }
   makeMove(request) {
+    console.log("got move request: ", request);
     // Basic checks
     if (!this.isStarted) { return { success: false, error: "Game not started" }; }
     if (this.isEnded) { return { success: false, error: "Game already over" }; }
-    if (!(request.player in this.playerIds)) { return { success: false, error: "Invalid playerId" }; }
-
-    function checkPlayer() {
-      if (request.player != this.playerIds[this.currentTurn]) {
-        return { success: false, error: "Not your turn" };
-      }
-    }
+    if (this.playerIds.indexOf(request.player) == -1) { return { success: false, error: "Invalid playerId" }; }
 
     var player = this.players[request.player];
     var field = this.fields[request.player];
@@ -115,7 +110,10 @@ class Game {
         field.expand();
       }
     } else if (request.action == "START_PHASE") {
-      checkPlayer();
+      if (request.player != this.playerIds[this.currentTurn]) {
+        return { success: false, error: "Not your turn" };
+      }
+
       if (request.phase == 1) {
         // first card gets planted
         if (!field.canPlant(player.hand[0])) {
@@ -138,7 +136,10 @@ class Game {
       }
 
     } else if (request.action == "PLANT") {
-      checkPlayer();
+      if (request.player != this.playerIds[this.currentTurn]) {
+        return { success: false, error: "Not your turn" };
+      }
+
       if (request.type == "HAND" && this.plantedFromHand < 2) {
         var card = player.removeCard(0);
         field.plant(request.slot, card);
@@ -153,7 +154,9 @@ class Game {
         field.plant(request.slot, card);
       }
     } else if (request.action == "PROPOSE_TRADE") {
-      checkPlayer();
+      if (request.player != this.playerIds[this.currentTurn]) {
+        return { success: false, error: "Not your turn" };
+      }
 
     } else if (request.action == "CONFIRM_TRADE") {
 
@@ -170,11 +173,11 @@ class Game {
     var playerJson = {};
     Object.keys(this.players).forEach(function(key) {
       playerJson[key] = this.players[key].getJson();
-    });
+    }, this);
     var fieldJson = {};
     Object.keys(this.fields).forEach(function(key) {
       fieldJson[key] = this.fields[key].getJson();
-    });
+    }, this);
 
     return {
       id: this.id,
@@ -196,11 +199,11 @@ class Game {
     var playerJson = {};
     Object.keys(this.players).forEach(function(key) {
       playerJson[key] = this.players[key].getJsonForPlayer(key);
-    });
+    }, this);
     var fieldJson = {};
     Object.keys(this.fields).forEach(function(key) {
       fieldJson[key] = this.fields[key].getJson();
-    });
+    }, this);
 
     return {
       id: this.id,
